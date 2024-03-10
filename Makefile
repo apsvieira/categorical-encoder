@@ -1,6 +1,6 @@
 # Inspired by: https://blog.mathieu-leplatre.info/tips-for-your-makefile-with-python.html
 
-PYMODULE := inmet
+PYMODULE := categorical_encoder
 TESTS := tests
 INSTALL_STAMP := .install.stamp
 POETRY := $(shell command -v poetry 2> /dev/null)
@@ -38,7 +38,7 @@ lint: $(INSTALL_STAMP)
     # 
     # $(POETRY) run black --check $(TESTS) $(PYMODULE) --diff
 	@if [ -z $(MYPY) ]; then echo "Mypy not found, skipping..."; else echo "Running Mypy..."; $(POETRY) run mypy $(PYMODULE) $(TESTS); fi
-	@echo "Running Ruff..."; $(POETRY) run ruff . --fix
+	@echo "Running Ruff..."; $(POETRY) run ruff check . --fix
 
 .PHONY: test
 test: $(INSTALL_STAMP)

@@ -1,3 +1,3 @@
-# inmet
+# categorical_encoder
 
-Exploration of meteorological data from [Inmet](https://portal.inmet.gov.br/).
+Implementation of hierarchical categorical encoders.
