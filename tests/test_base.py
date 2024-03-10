@@ -1,11 +1,11 @@
+import pytest
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
-from pytest import fixture
 
 from categorical_encoder.base import HierachicalCategoricalEncoder
 
 
-@fixture()
+@pytest.fixture()
 def simple_data() -> DataFrame:
     return DataFrame(
         {
@@ -31,7 +31,7 @@ def test_single_column_encoding(simple_data):
             "_l0_": ["None", "None"],
             "column1": ["0", "1"],
             "__encoding__": [0.5, 2.5],
-        }
+        },
     )
 
     assert encoding is not None
@@ -51,7 +51,7 @@ def test_single_column_encoding(simple_data):
             "_l0_": ["None", "None"],
             "column2": ["0", "1"],
             "__encoding__": [1.5, 1.5],
-        }
+        },
     )
     assert encoding is not None
     assert_frame_equal(expected, encoding)
@@ -71,7 +71,7 @@ def test_single_column_encoding_without_min_sample_size(simple_data):
             "_l0_": ["None", "None"],
             "column1": ["0", "1"],
             "__encoding__": [1.5, 1.5],
-        }
+        },
     )
 
     assert encoding is not None
@@ -93,7 +93,7 @@ def test_multi_column_encoding(simple_data):
             "column1": ["0", "0", "1", "1"],
             "column2": ["0", "1", "0", "1"],
             "__encoding__": [0.5, 0.5, 2.5, 2.5],
-        }
+        },
     )
 
     assert encoding is not None

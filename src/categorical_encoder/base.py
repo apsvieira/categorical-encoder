@@ -1,32 +1,54 @@
 """Base estimator for categorical encoders."""
 
-from typing import List, Union
+from typing import Union
 
-import pandas as pd
 from pandas import DataFrame, NamedAgg, Series
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
     """
-    A HierachicalCategoricalEncoder is a categorical encoder that can handle
-    multiple columns at once to produce a single encoding value.
+    An encoder that represents a hierarchy of categorical columns.
+
     This is useful for encoding hierarchical data, such as various levels of
     geographical information (eg Country, State, City, etc.)
     """
 
     def __init__(
-        self,
-        columns: Union[str, List[str]],
+        self: "HierachicalCategoricalEncoder",
+        columns: Union[str, list[str]],
         min_samples: int,
         agg_fn: Union[str, NamedAgg],
-        target_column: str = "__target__",
+        target_col: str = "__target__",
     ) -> None:
+        """
+        Initialize the encoder.
+
+        Parameters
+        ----------
+        columns : Union[str, list[str]]
+            The columns to encode. If a string is passed, it will be treated as a
+            single column. If a list is passed, it will be treated as multiple
+            columns to encode hierarchically.
+        min_samples : int
+            The minimum number of samples required to calculate the encoding.
+            If the number of samples is less than this value, the encoding will
+            be interpolated from the prior level.
+        agg_fn : Union[str, NamedAgg]
+            The aggregation function to use for encoding. This can be a string
+            (eg "mean", "median", "sum", etc.) or a NamedAgg object.
+        target_col : str
+            The name of the target column.
+            This is used to represent the target values internally.
+
+        """
         if not isinstance(columns, (str, list)):
-            raise TypeError("columns must be a string or list of strings")
+            msg = "columns must be a string or list of strings"
+            raise TypeError(msg)
 
         if min_samples < 0:
-            raise ValueError("min_samples must be a positive integer")
+            msg = "min_samples must be a positive integer"
+            raise ValueError(msg)
 
         super().__init__()
 
@@ -39,17 +61,20 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         self.columns = columns
         self.min_samples = min_samples
         self.agg_fn = agg_fn
-        self.target_column = target_column
+        self._target_col = target_col
 
         self.encoding: DataFrame = None
 
-    def fit(self, X: DataFrame, y: Series) -> "HierachicalCategoricalEncoder":
+    def fit(
+        self: "HierachicalCategoricalEncoder", X: DataFrame, y: Series,
+    ) -> "HierachicalCategoricalEncoder":
         """Construct encoding values."""
         if X.shape[0] != y.shape[0]:
-            raise ValueError("X and y must have the same number of rows")
+            msg = "X and y must have the same number of rows"
+            raise ValueError(msg)
 
         data = X.copy()
-        data[self.target_column] = y.copy()
+        data[self._target_col] = y.copy()
         data["_l0_"] = "None"
         aggs = [
             NamedAgg("count", "count"),
@@ -57,14 +82,18 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         ]
 
         # Base case: the first level of encoding is just the target column aggregated
-        level_0 = data.groupby("_l0_", as_index=False)[[self.target_column]].agg(aggs)
+        level_0 = data.groupby("_l0_", as_index=False)[[self._target_col]].agg(aggs)
         level_0.columns = ["_l0_", "count", self.agg_fn.column]
         prior = level_0
 
-        columns = ["_l0_"] + self.columns
+        # If there are multiple levels, we need to iterate through each
+        # level using the level before it as an encoding prior.
+        # We can do this by calculating the encoding for each level and
+        # interpolating the prior encoding when necessary.
+        columns = ["_l0_", *self.columns]
         for i, _ in enumerate(self.columns):
             encoding = data.groupby(columns[: i + 2], as_index=False)[
-                self.target_column
+                self._target_col
             ].agg(aggs)
             merged = _merge_levels(
                 prior,
@@ -76,12 +105,6 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
             )
             prior = merged
             self.encoding = merged
-            print("encoding", self.encoding)
-
-        # If there are multiple levels, we need to iterate through each
-        # level using the level before it as an encoding prior.
-        # We can do this by calculating the encoding for each level and
-        # interpolating the prior encoding when necessary.
 
         return self
 
@@ -89,7 +112,7 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
 def _merge_levels(
     prior: DataFrame,
     current: DataFrame,
-    on: List[str],
+    on: list[str],
     current_level: str,
     agg_fn: NamedAgg,
     min_samples: int,
@@ -106,6 +129,5 @@ def _merge_levels(
         merged["count"] >= min_samples,
         merged[agg_fn.column + "_prior"],
     )
-    print("merged", merged)
 
-    return merged[on + [current_level, agg_fn.column]]
+    return merged[[*on, current_level, agg_fn.column]]

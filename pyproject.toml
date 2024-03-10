@@ -105,7 +105,7 @@ line-length = 120
 # preview = true
 show-fixes = true
 src = ['src',]
-target-version = 'py38'
+target-version = 'py39'
 
 [tool.ruff.lint]
 select = [
@@ -126,7 +126,7 @@ select = [
     'ERA',  # Commented-out code
     'EXE',  # Executable
     'F',    # Pyflakes
-    'FA',   # __future__ annotations
+    # 'FA',   # __future__ annotations
     'FLY',  # F-strings
     # 'FURB', # Refurb
     'G',    # Logging format
@@ -136,7 +136,7 @@ select = [
     'INT',  # gettext
     'ISC',  # Implicit str concat
     # 'LOG',  # Logging
-    'N',    # PEP-8 Naming
+    # 'N',    # PEP-8 Naming
     'NPY',  # Numpy
     'PERF', # Unnecessary performance costs
     'PGH',  # Pygrep hooks
@@ -184,7 +184,7 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 # https://beta.ruff.rs/docs/rules/
 '__init__.py' = ['F401','F403','F405',]
-'tests/*' = ['ANN', 'ARG', 'INP001', 'S101',]
+'tests/*' = ['ANN', 'ARG', 'D', 'INP001', 'S101']
 
 
 [tool.ruff.lint.pylint]
