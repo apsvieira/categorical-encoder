@@ -202,7 +202,7 @@ ban-relative-imports = 'all'
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py39, py310, py311, py312, py313
+envlist = py39, py310, py311, py312
 skip_missing_interpreters = true
 
 [gh-actions]
@@ -211,7 +211,6 @@ python =
     3.10: py310
     3.11: py311
     3.12: py312
-    3.13: py313
 
 [testenv]
 passenv = GITHUB_*
