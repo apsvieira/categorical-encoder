@@ -16,7 +16,7 @@ def simple_data() -> DataFrame:
     )
 
 
-def test_single_column_encoding(simple_data):
+def test_fit_single_column_encoding(simple_data):
     # Test for column 1
     encoder = HierachicalCategoricalEncoder(
         columns=["column1"],
@@ -57,7 +57,7 @@ def test_single_column_encoding(simple_data):
     assert_frame_equal(expected, encoding)
 
 
-def test_single_column_encoding_without_min_sample_size(simple_data):
+def test_fit_single_column_encoding_without_min_sample_size(simple_data):
     # Column 1
     encoder = HierachicalCategoricalEncoder(
         columns=["column1"],
@@ -99,7 +99,7 @@ def test_single_column_encoding_without_min_sample_size(simple_data):
     assert_frame_equal(expected, encoding)
 
 
-def test_multi_column_encoding(simple_data):
+def test_fit_multi_column_encoding(simple_data):
     # Columns 1 and 2
     encoder = HierachicalCategoricalEncoder(
         columns=["column1", "column2"],
@@ -143,7 +143,7 @@ def test_multi_column_encoding(simple_data):
     assert_frame_equal(expected, encoding)
 
 
-def test_multi_column_encoding_with_min_sample_size(simple_data):
+def test_fit_multi_column_encoding_with_min_sample_size(simple_data):
     encoder = HierachicalCategoricalEncoder(
         columns=["column1", "column2"],
         min_samples=4,
