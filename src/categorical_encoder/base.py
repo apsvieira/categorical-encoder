@@ -15,7 +15,7 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
     """
 
     def __init__(
-        self: "HierachicalCategoricalEncoder",
+        self,
         columns: Union[str, list[str]],
         min_samples: int,
         agg_fn: Union[str, NamedAgg],
@@ -66,7 +66,9 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         self.encoding: DataFrame = None
 
     def fit(
-        self: "HierachicalCategoricalEncoder", X: DataFrame, y: Series,
+        self,
+        X: DataFrame,
+        y: Series,
     ) -> "HierachicalCategoricalEncoder":
         """Construct encoding values."""
         if X.shape[0] != y.shape[0]:
@@ -107,6 +109,32 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
             self.encoding = merged
 
         return self
+
+    def transform(self, X: DataFrame) -> DataFrame:
+        """Transform the input data using the encoding."""
+        if self.encoding is None:
+            msg = "fit must be called before transform"
+            raise ValueError(msg)
+
+        data = X.copy()
+        data["_l0_"] = "None"
+        merge_cols = self.encoding.columns.tolist()[:-1]
+        data = data.merge(
+            self.encoding,
+            how="left",
+            on=merge_cols,
+            suffixes=("", "_encoding"),
+        )
+        data = data.drop("_l0_", axis=1)
+
+        # Should add only the encoding column.
+        if data.shape[1] != X.shape[1] + 1:
+            msg = (
+                f"transformed data has an incorrect number of columns ({data.shape[1]})"
+            )
+            raise ValueError(msg)
+
+        return data
 
 
 def _merge_levels(

@@ -163,6 +163,7 @@ select = [
     'YTT',  # sys.version
 ]
 ignore = [
+    'ANN101',  # Missing type annotation for self
     'D104',    # Missing docstring in public package
     'D203',    # One blank line before class docstring
     'D212',    # Multi-line summary first line

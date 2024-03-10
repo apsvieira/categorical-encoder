@@ -16,7 +16,7 @@ def simple_data() -> DataFrame:
     )
 
 
-def test_fit_single_column_encoding(simple_data):
+def test_single_column_encoding(simple_data):
     # Test for column 1
     encoder = HierachicalCategoricalEncoder(
         columns=["column1"],
@@ -33,9 +33,18 @@ def test_fit_single_column_encoding(simple_data):
             "__encoding__": [0.5, 2.5],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
+
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [0.5, 0.5, 0.5, 0.5, 2.5, 2.5, 2.5, 2.5],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
 
     # Test for column 2
     encoder = HierachicalCategoricalEncoder(
@@ -53,11 +62,10 @@ def test_fit_single_column_encoding(simple_data):
             "__encoding__": [1.0, 2.0],
         },
     )
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
 
-def test_fit_single_column_encoding_without_min_sample_size(simple_data):
+def test_single_column_encoding_without_min_sample_size(simple_data):
     # Column 1
     encoder = HierachicalCategoricalEncoder(
         columns=["column1"],
@@ -74,8 +82,6 @@ def test_fit_single_column_encoding_without_min_sample_size(simple_data):
             "__encoding__": [1.5, 1.5],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
     # Column 2
@@ -94,12 +100,10 @@ def test_fit_single_column_encoding_without_min_sample_size(simple_data):
             "__encoding__": [1.5, 1.5],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
 
-def test_fit_multi_column_encoding(simple_data):
+def test_multi_column_encoding(simple_data):
     # Columns 1 and 2
     encoder = HierachicalCategoricalEncoder(
         columns=["column1", "column2"],
@@ -117,8 +121,6 @@ def test_fit_multi_column_encoding(simple_data):
             "__encoding__": [0.0, 1.0, 2.0, 3.0],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
     # Columns 2 and 1
@@ -138,12 +140,10 @@ def test_fit_multi_column_encoding(simple_data):
             "__encoding__": [0.0, 2.0, 1.0, 3.0],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
 
-def test_fit_multi_column_encoding_with_min_sample_size(simple_data):
+def test_multi_column_encoding_with_min_sample_size(simple_data):
     encoder = HierachicalCategoricalEncoder(
         columns=["column1", "column2"],
         min_samples=4,
@@ -160,8 +160,6 @@ def test_fit_multi_column_encoding_with_min_sample_size(simple_data):
             "__encoding__": [0.5, 0.5, 2.5, 2.5],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
 
     # Inverse order
@@ -181,6 +179,4 @@ def test_fit_multi_column_encoding_with_min_sample_size(simple_data):
             "__encoding__": [1.0, 1.0, 2.0, 2.0],
         },
     )
-
-    assert encoding is not None
     assert_frame_equal(expected, encoding)
