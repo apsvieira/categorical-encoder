@@ -64,6 +64,17 @@ def test_single_column_encoding(simple_data):
     )
     assert_frame_equal(expected, encoding)
 
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
+
 
 def test_single_column_encoding_without_min_sample_size(simple_data):
     # Column 1
@@ -84,6 +95,17 @@ def test_single_column_encoding_without_min_sample_size(simple_data):
     )
     assert_frame_equal(expected, encoding)
 
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
+
     # Column 2
     encoder = HierachicalCategoricalEncoder(
         columns=["column2"],
@@ -101,6 +123,17 @@ def test_single_column_encoding_without_min_sample_size(simple_data):
         },
     )
     assert_frame_equal(expected, encoding)
+
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
 
 
 def test_multi_column_encoding(simple_data):
@@ -123,6 +156,17 @@ def test_multi_column_encoding(simple_data):
     )
     assert_frame_equal(expected, encoding)
 
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [0.0, 0.0, 1.0, 1.0, 2.0, 2.0, 3.0, 3.0],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
+
     # Columns 2 and 1
     encoder = HierachicalCategoricalEncoder(
         columns=["column2", "column1"],
@@ -141,6 +185,17 @@ def test_multi_column_encoding(simple_data):
         },
     )
     assert_frame_equal(expected, encoding)
+
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [0.0, 0.0, 1.0, 1.0, 2.0, 2.0, 3.0, 3.0],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
 
 
 def test_multi_column_encoding_with_min_sample_size(simple_data):
@@ -162,6 +217,17 @@ def test_multi_column_encoding_with_min_sample_size(simple_data):
     )
     assert_frame_equal(expected, encoding)
 
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [0.5, 0.5, 0.5, 0.5, 2.5, 2.5, 2.5, 2.5],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
+
     # Inverse order
     encoder = HierachicalCategoricalEncoder(
         columns=["column2", "column1"],
@@ -180,3 +246,14 @@ def test_multi_column_encoding_with_min_sample_size(simple_data):
         },
     )
     assert_frame_equal(expected, encoding)
+
+    with_encoding = encoder.transform(simple_data)
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "0", "0", "1", "1", "1", "1"],
+            "column2": ["0", "0", "1", "1", "0", "0", "1", "1"],
+            "target": [0, 0, 1, 1, 2, 2, 3, 3],
+            "__encoding__": [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0],
+        },
+    )
+    assert_frame_equal(expected, with_encoding)
