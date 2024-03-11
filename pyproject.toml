@@ -13,12 +13,12 @@ omit = [
 
 
 [tool.poetry]
-name = 'inmet'
+name = 'categorical_encoder'
 version = '0.1.0'
 description = "A template Poetry project structure."
 
 packages = [
-    { include = 'inmet', from = 'src' },
+    { include = 'categorical_encoder', from = 'src' },
 ]
 
 authors = ["Antonio Pedro <@apsvieira>",]
@@ -28,9 +28,9 @@ include = ['CHANGELOG.md', 'LICENSE', 'py.typed',]
 license = 'MIT'
 readme = 'README.md'
 
-homepage = 'https://pypi.org/project/inmet/'
-repository = 'https://github.com/apsvieira/inmet'
-documentation = 'https://github.com/apsvieira/inmet/tree/main/docs'
+homepage = 'https://pypi.org/project/categorical_encoder/'
+repository = 'https://github.com/apsvieira/categorical-encoder'
+documentation = 'https://github.com/apsvieira/categorical-encoder/tree/main/docs'
 
 keywords = [
     'python3',
@@ -51,8 +51,10 @@ classifiers = [
 
 
 [tool.poetry.dependencies]
-python = '^3.8.1'
+python = '^3.9.0'
 ruff = "^0.3.2"
+pandas = "^2.2.1"
+scikit-learn = "^1.4.1.post1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -79,8 +81,8 @@ tox-gh-actions = '^3.2.0'
 
 
 [tool.poetry.urls]
-"Tracker" = 'https://github.com/apsvieira/inmet/issues'
-"Changelog" = 'https://github.com/apsvieira/inmet/blob/main/CHANGELOG.md'
+"Tracker" = 'https://github.com/apsvieira/categorical-encoder/issues'
+"Changelog" = 'https://github.com/apsvieira/categorical-encoder/blob/main/CHANGELOG.md'
 
 
 [tool.pytest.ini_options]
@@ -103,7 +105,7 @@ line-length = 120
 # preview = true
 show-fixes = true
 src = ['src',]
-target-version = 'py38'
+target-version = 'py39'
 
 [tool.ruff.lint]
 select = [
@@ -124,7 +126,7 @@ select = [
     'ERA',  # Commented-out code
     'EXE',  # Executable
     'F',    # Pyflakes
-    'FA',   # __future__ annotations
+    # 'FA',   # __future__ annotations
     'FLY',  # F-strings
     # 'FURB', # Refurb
     'G',    # Logging format
@@ -134,7 +136,7 @@ select = [
     'INT',  # gettext
     'ISC',  # Implicit str concat
     # 'LOG',  # Logging
-    'N',    # PEP-8 Naming
+    # 'N',    # PEP-8 Naming
     'NPY',  # Numpy
     'PERF', # Unnecessary performance costs
     'PGH',  # Pygrep hooks
@@ -161,6 +163,7 @@ select = [
     'YTT',  # sys.version
 ]
 ignore = [
+    'ANN101',  # Missing type annotation for self
     'D104',    # Missing docstring in public package
     'D203',    # One blank line before class docstring
     'D212',    # Multi-line summary first line
@@ -182,7 +185,7 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 # https://beta.ruff.rs/docs/rules/
 '__init__.py' = ['F401','F403','F405',]
-'tests/*' = ['ANN', 'ARG', 'INP001', 'S101',]
+'tests/*' = ['ANN', 'ARG', 'D', 'INP001', 'S101',]
 
 
 [tool.ruff.lint.pylint]
