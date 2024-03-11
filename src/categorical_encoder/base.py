@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from pandas import DataFrame, NamedAgg, Series
+from pandas import DataFrame, NamedAgg, Series, concat
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -63,7 +63,7 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         self.agg_fn = agg_fn
         self._target_col = target_col
 
-        self.encoding: DataFrame = None
+        self._levels = []
 
     def fit(
         self,
@@ -86,7 +86,9 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         # Base case: the first level of encoding is just the target column aggregated
         level_0 = data.groupby("_l0_", as_index=False)[[self._target_col]].agg(aggs)
         level_0.columns = ["_l0_", "count", self.agg_fn.column]
+        level_0 = level_0.drop(["count"], axis=1)
         prior = level_0
+        levels = [level_0]
 
         # If there are multiple levels, we need to iterate through each
         # level using the level before it as an encoding prior.
@@ -106,26 +108,45 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
                 self.min_samples,
             )
             prior = merged
-            self.encoding = merged
+            levels.append(merged)
+
+        self._levels = levels
 
         return self
 
+    @property
+    def encoding(self) -> DataFrame:
+        """Return the encoding."""
+        return self._levels[-1]
+
     def transform(self, X: DataFrame) -> DataFrame:
         """Transform the input data using the encoding."""
-        if self.encoding is None:
+        if len(self._levels) == 0:
             msg = "fit must be called before transform"
             raise ValueError(msg)
 
-        data = X.copy()
-        data["_l0_"] = "None"
-        merge_cols = self.encoding.columns.tolist()[:-1]
-        data = data.merge(
-            self.encoding,
-            how="left",
-            on=merge_cols,
-            suffixes=("", "_encoding"),
-        )
-        data = data.drop("_l0_", axis=1)
+        not_matched = X.copy()
+        not_matched["_l0_"] = "None"
+
+        # Perform partial merges to get the encoding.
+        # Should use as much information as there is, and fill in with
+        # priors whenever a value is new or has too few samples.
+        # This loop is probably terrible for performance.
+        # It's very straight forward, and I couldn't think of a way to
+        # do this in a single merge or even using less indexing.
+        matched_rows = []
+        for encoding in self._levels[::-1]:
+            if not_matched.shape[0] == 0:
+                break
+
+            merge_cols = encoding.columns.tolist()[:-1]
+            matched = not_matched.merge(encoding, how="left", on=merge_cols)
+            mask = matched[self.agg_fn.column].isna()
+            matched_rows.append(matched.loc[~mask, :].reset_index(drop=True))
+            not_matched = not_matched.loc[mask, :].reset_index(drop=True)
+
+        data = concat(matched_rows, axis=0, ignore_index=True)
+        data = data.drop(["_l0_"], axis=1)
 
         # Should add only the encoding column.
         if data.shape[1] != X.shape[1] + 1:

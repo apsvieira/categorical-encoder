@@ -257,3 +257,39 @@ def test_multi_column_encoding_with_min_sample_size(simple_data):
         },
     )
     assert_frame_equal(expected, with_encoding)
+
+
+def test_multi_column_encode_missing(simple_data):
+    encoder = HierachicalCategoricalEncoder(
+        columns=["column1", "column2"],
+        min_samples=1,
+        agg_fn="mean",
+    )
+    encoder.fit(simple_data, simple_data["target"])
+
+    encoding = encoder.encoding
+    expected = DataFrame(
+        {
+            "_l0_": ["None", "None", "None", "None"],
+            "column1": ["0", "0", "1", "1"],
+            "column2": ["0", "1", "0", "1"],
+            "__encoding__": [0.0, 1.0, 2.0, 3.0],
+        },
+    )
+    assert_frame_equal(expected, encoding)
+
+    test_data = DataFrame(
+        {
+            "column1": ["0", "0", "1", "1", "1", "2"],
+            "column2": ["0", "1", "0", "1", "2", "1"],
+        },
+    )
+    expected = DataFrame(
+        {
+            "column1": ["0", "0", "1", "1", "1", "2"],
+            "column2": ["0", "1", "0", "1", "2", "1"],
+            "__encoding__": [0.0, 1.0, 2.0, 3.0, 2.5, 1.5],
+        },
+    )
+    with_encoding = encoder.transform(test_data)
+    assert_frame_equal(expected, with_encoding)
