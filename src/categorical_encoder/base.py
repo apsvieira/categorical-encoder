@@ -1,9 +1,11 @@
 """Base estimator for categorical encoders."""
 
-from typing import Union
+from typing import Optional, Union
 
 from pandas import DataFrame, NamedAgg, Series, concat
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from categorical_encoder.smoothing import SmoothingFnType, step_function
 
 
 class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
@@ -17,8 +19,8 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         columns: Union[str, list[str]],
-        min_samples: int,
         agg_fn: Union[str, NamedAgg],
+        smoothing_fn: Optional[SmoothingFnType] = None,
         target_col: str = "__target__",
     ) -> None:
         """
@@ -30,13 +32,13 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
             The columns to encode. If a string is passed, it will be treated as a
             single column. If a list is passed, it will be treated as multiple
             columns to encode hierarchically.
-        min_samples : int
-            The minimum number of samples required to calculate the encoding.
-            If the number of samples is less than this value, the encoding will
-            be interpolated from the prior level.
         agg_fn : Union[str, NamedAgg]
             The aggregation function to use for encoding. This can be a string
             (eg "mean", "median", "sum", etc.) or a NamedAgg object.
+        smoothing_fn: Callable[[Series, Series, Series], Series]
+            A function that interpolates between the current encoding and the prior.
+            The minimum number of samples required to calculate the encoding
+            should be passed to the function.
         target_col : str
             The name of the target column.
             This is used to represent the target values internally.
@@ -46,10 +48,6 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
             msg = "columns must be a string or list of strings"
             raise TypeError(msg)
 
-        if min_samples < 0:
-            msg = "min_samples must be a positive integer"
-            raise ValueError(msg)
-
         super().__init__()
 
         if isinstance(columns, str):
@@ -58,8 +56,11 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
         if not isinstance(agg_fn, NamedAgg):
             agg_fn = NamedAgg(column="__encoding__", aggfunc=agg_fn)
 
+        if smoothing_fn is None:
+            smoothing_fn = step_function(min_samples=1)
+
         self.columns = columns
-        self.min_samples = min_samples
+        self.smoothing_fn = smoothing_fn
         self.agg_fn = agg_fn
         self._target_col = target_col
 
@@ -105,7 +106,7 @@ class HierachicalCategoricalEncoder(BaseEstimator, TransformerMixin):
                 columns[: i + 1],
                 columns[i + 1],
                 self.agg_fn,
-                self.min_samples,
+                self.smoothing_fn,
             )
             prior = merged
             levels.append(merged)
@@ -164,7 +165,7 @@ def _merge_levels(
     on: list[str],
     current_level: str,
     agg_fn: NamedAgg,
-    min_samples: int,
+    smoothing_fn: SmoothingFnType,
 ) -> DataFrame:
     """Merge two levels of encoding."""
     merged = prior.merge(
@@ -174,8 +175,9 @@ def _merge_levels(
         suffixes=("_prior", ""),
     )
 
-    merged[agg_fn.column] = merged[agg_fn.column].where(
-        merged["count"] >= min_samples,
+    merged[agg_fn.column] = smoothing_fn(
+        merged[agg_fn.column],
+        merged["count"],
         merged[agg_fn.column + "_prior"],
     )
 
