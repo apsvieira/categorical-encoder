@@ -2,11 +2,10 @@
 
 from typing import Callable
 
-from numpy import min as np_min
 from pandas import Series
 from toolz.functoolz import curry
 
-SmoothingFnType = Callable[[Series, Series, Series, int], Series]
+SmoothingFnType = Callable[[Series, Series, Series], Series]
 """Type signature for smoothing functions."""
 
 
@@ -61,8 +60,6 @@ def convex_combination(
     If the number of samples is less than x_min, the prior encoding will be used.
     If the number of samples is greater than x_max, the current encoding will be used.
 
-    $
-
     Parameters
     ----------
     encoding : Series
@@ -82,6 +79,9 @@ def convex_combination(
         The smoothed encoding.
 
     """
+    if x_min > x_max:
+        msg = f"{x_min=} must be less than or equal to {x_max=}"
+        raise ValueError(msg)
 
     capped_x = num_samples.clip(x_min, x_max)
     return prior + (encoding - prior) * (capped_x - x_min) / (x_max - x_min)
