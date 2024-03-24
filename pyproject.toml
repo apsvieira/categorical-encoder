@@ -52,7 +52,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = '^3.9.0'
-ruff = "^0.3.3"
+ruff = "^0.3.4"
 pandas = "^2.2.1"
 scikit-learn = "^1.4.1.post1"
 toolz = "^0.12.1"
@@ -67,7 +67,7 @@ optional = true
 
 
 [tool.poetry.group.linters.dependencies]
-ruff = '^0.3.3'
+ruff = '^0.3.4'
 
 
 [tool.poetry.group.tests]
@@ -77,7 +77,7 @@ optional = true
 [tool.poetry.group.tests.dependencies]
 pytest = '^8.1.1'
 pytest-cov = '^4.1.0'
-tox = '^4.14.1'
+tox = '^4.14.2'
 tox-gh-actions = '^3.2.0'
 
 
