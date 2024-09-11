@@ -54,7 +54,7 @@ classifiers = [
 python = '^3.9.0'
 ruff = "^0.6.4"
 pandas = "^2.2.2"
-scikit-learn = "^1.5.1"
+scikit-learn = "^1.5.2"
 toolz = "^0.12.1"
 
 
