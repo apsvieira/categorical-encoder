@@ -632,13 +632,13 @@ files = [
 
 [[package]]
 name = "toolz"
-version = "0.12.1"
+version = "1.0.0"
 description = "List processing tools and functional utilities"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "toolz-0.12.1-py3-none-any.whl", hash = "sha256:d22731364c07d72eea0a0ad45bafb2c2937ab6fd38a3507bf55eae8744aa7d85"},
-    {file = "toolz-0.12.1.tar.gz", hash = "sha256:ecca342664893f177a13dac0e6b41cbd8ac25a358e5f215316d43e2100224f4d"},
+    {file = "toolz-1.0.0-py3-none-any.whl", hash = "sha256:292c8f1c4e7516bf9086f8850935c799a874039c8bcf959d47b600e4c44a6236"},
+    {file = "toolz-1.0.0.tar.gz", hash = "sha256:2c86e3d9a04798ac556793bced838816296a2f085017664e4995cb40a1047a02"},
 ]
 
 [[package]]
@@ -731,4 +731,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.0"
-content-hash = "9f127d2176e0025979570f9a2500212076f1ce274bd3be89eb3aaf7d72369386"
+content-hash = "ab4ddc086d5c4059cf527b67f4732605e72f22860207d2966d0fb0f09049eecc"

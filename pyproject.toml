@@ -55,7 +55,7 @@ python = '^3.9.0'
 ruff = "^0.6.8"
 pandas = "^2.2.3"
 scikit-learn = "^1.5.2"
-toolz = "^0.12.1"
+toolz = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
