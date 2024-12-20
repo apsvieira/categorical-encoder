@@ -59,7 +59,7 @@ toolz = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-mypy = '^1.13.0'
+mypy = '^1.14.0'
 
 
 [tool.poetry.group.linters]
