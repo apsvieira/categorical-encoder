@@ -6,7 +6,7 @@ from categorical_encoder.base import HierachicalCategoricalEncoder
 from categorical_encoder.smoothing import convex_combination
 
 
-@pytest.fixture()
+@pytest.fixture
 def simple_data() -> DataFrame:
     return DataFrame(
         {
